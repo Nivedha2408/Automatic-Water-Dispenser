@@ -1,0 +1,45 @@
+// Arduino Code 
+const int trigPin = 2;  // Ultrasonic Sensor Trig pin
+const int echoPin = 3;  // Ultrasonic Sensor Echo pin
+const int motor1Pin = 4;  // Motor Driver Motor1 pin
+const int motor2Pin = 5;  // Motor Driver Motor2 pin
+const int pumpActivationTime = 5000;  // Time to activate the pump (5 seconds)
+const int minDistance = 10;  // Minimum distance to detect (10 cm)
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(motor1Pin, OUTPUT);
+  pinMode(motor2Pin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int distance = calculateDistance();
+
+  if (distance <= minDistance) {  // Object detected within minimum distance
+    Serial.println("Object detected. Activating pump...");
+    activatePump();
+  } else {
+    Serial.println("No object detected.");
+  }
+
+  delay(1000);  // Check for objects every 1 second
+}
+
+int calculateDistance() {
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  int duration = pulseIn(echoPin, HIGH);
+  int distance = duration * 0.034 / 2;
+  return distance;
+}
+
+void activatePump() {
+  digitalWrite(motor1Pin, HIGH);
+  digitalWrite(motor2Pin, LOW);
+  delay(pumpActivationTime);  // Activate the pump for 5 seconds
+  digitalWrite(motor1Pin, LOW);
+  digitalWrite(motor2Pin, HIGH);
+}
